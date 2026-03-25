@@ -15,58 +15,12 @@ code like this:
 ``` r
 library(readr)
 library(dplyr)
-```
-
-
-    Attaching package: 'dplyr'
-
-    The following objects are masked from 'package:stats':
-
-        filter, lag
-
-    The following objects are masked from 'package:base':
-
-        intersect, setdiff, setequal, union
-
-``` r
 library(janitor)
-```
-
-
-    Attaching package: 'janitor'
-
-    The following objects are masked from 'package:stats':
-
-        chisq.test, fisher.test
-
-``` r
 library(forcats)
 library(tidyverse)
-```
-
-    ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-    ✔ ggplot2   4.0.2     ✔ stringr   1.6.0
-    ✔ lubridate 1.9.5     ✔ tibble    3.3.1
-    ✔ purrr     1.2.1     ✔ tidyr     1.3.2
-
-    ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-    ✖ dplyr::filter() masks stats::filter()
-    ✖ dplyr::lag()    masks stats::lag()
-    ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
-
-``` r
 library(ggplot2)
 tvseries<- read_csv("data/Animated_Tv_Series.csv")
 ```
-
-    Rows: 1816 Columns: 10
-    ── Column specification ────────────────────────────────────────────────────────
-    Delimiter: ","
-    chr (7): Title, Year, Original channel, American company, Note, Technique, G...
-    dbl (3): Id, Episodes, IMDb
-
-    ℹ Use `spec()` to retrieve the full column specification for this data.
-    ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 
 ### **Data Description**
 
