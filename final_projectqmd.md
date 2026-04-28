@@ -10,7 +10,7 @@ finished document. To learn more about Quarto see <https://quarto.org>.
 
 When you click the **Render** button a document will be generated that
 includes both content and the output of embedded code. You can embed
-code like this:
+code like this:![](images/clipboard-40922044.png)
 
 ``` r
 library(readr)
@@ -18,8 +18,30 @@ library(dplyr)
 library(janitor)
 library(forcats)
 library(tidyverse)
+library(stringr)
 library(ggplot2)
 tvseries<- read_csv("data/Animated_Tv_Series.csv")
+```
+
+``` r
+tvclean <- tvseries |>
+  clean_names() |>
+  select(id, title, episodes, year, original_channel, technique, im_db, google_users) |>
+  drop_na() |>
+  separate(year, into = c("start_year", "end_year"), sep = "-") |>
+  mutate(across(c(start_year, end_year), as.numeric))
+```
+
+``` r
+tvclean |>
+  group_by(original_channel, start_year) |>
+  summarize(total_episodes = sum(episodes, na.rm = TRUE), .groups = "drop") |>
+  filter(
+    original_channel %in% c("Cartoon Network", "Nickelodeon", "Disney Channel", "Netflix", "Adult Swim", "Fox")) |>
+  ggplot(aes(x = start_year, y = total_episodes, fill = original_channel)) +
+  geom_col(position = "dodge") +
+  scale_fill_viridis_d(option ="mako")
+  #scale_fill_manual(values = c("#823749", "#983998", "#109", "#324556", "#676", "#217"))
 ```
 
 ### **Data Description**
@@ -34,11 +56,11 @@ tvseries<- read_csv("data/Animated_Tv_Series.csv")
     titles of shows, the year of which they were on air for, the IMDb
     ratings, maybe the episodes, and the techniques.
 
-3.  - What is the most popular TVchannel in each year? I will answer
-      this by summing up the amount of shows releases within that year
-      for that particular channel.
+3.  What is the most popular TV channel in each year? I will answer this
+    by summing up the amount of shows releases within that year for that
+    particular channel.
 
-- What is the highest rated TVshow in each year? based on IMDb
+- What is the highest rated TV show in each year? based on IMDb
 - Which TV channel produces the most CGI based series? alternative
   question: How has the use of CGI in TV series changed over time?
   another alternative, what are the most common techniques used to
