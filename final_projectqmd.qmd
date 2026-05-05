@@ -4,7 +4,8 @@ format: gfm
 editor: visual
 execute: 
   eval: false
-  echo: true
+  echo: false
+  warning: false
 ---
 
 ## Quarto
@@ -38,16 +39,36 @@ tvclean <- tvseries |>
 ```
 
 ```{r}
-#| label: visualizations
+#| label: visualization-1
 tvclean |>
   group_by(original_channel, start_year) |>
-  summarize(total_episodes = sum(episodes, na.rm = TRUE), .groups = "drop") |>
-  filter(
-    original_channel %in% c("Cartoon Network", "Nickelodeon", "Disney Channel", "Netflix", "Adult Swim", "Fox")) |>
-  ggplot(aes(x = start_year, y = total_episodes, fill = original_channel)) +
-  geom_col(position = "dodge") +
-  scale_fill_viridis_d(option ="mako")
+  summarize(mean_imdb = mean(im_db, na.rm = TRUE), .groups = "drop") |>
+  arrange(desc(mean_imdb)) |>
+  filter(start_year >= 2000, start_year <= 2019) |>
+  slice_head(n=100) |>
+ # filter(
+  #  original_channel %in% c("Cartoon Network", "Nickelodeon", "Disney Channel", "Adult Swim", "Fox")) |>
+  ggplot(aes(x = start_year, y = mean_imdb, fill = original_channel)) +
+  geom_tile(position = "dodge") +
+  scale_fill_viridis_d(option ="mako") +
+  theme(legend.text = element_blank())
   #scale_fill_manual(values = c("#823749", "#983998", "#109", "#324556", "#676", "#217"))
+```
+
+```{r}
+#| label: visualization-2
+#tv show versus imdb
+tvclean|>
+  filter(original_channel %in% c("Adult Swim", "Cartoon Network", "Disney Channel", "Nickelodeon")) |>
+  arrange(desc(episodes)) |>
+  slice_head(n = 40) |>
+  mutate(new_title = str_remove(title, "\\s*\\(\\d{4}\\)$")) |> #see chat gpt conversation.txt
+  ggplot(aes(x = im_db, y = new_title, fill = original_channel)) +
+  geom_col() +
+  labs(x= "Title of Tv Shows",
+       y = "imdb") +
+  scale_fill_viridis_d(option = "mako") +
+  theme(axis.text.x = element_text(angle = 0, hjust = 1))
 ```
 
 
@@ -59,7 +80,7 @@ tvclean |>
 
 3.  What is the most popular TV channel in each year? I will answer this by summing up the amount of shows releases within that year for that particular channel.
 
--   What is the highest rated TV show in each year? based on IMDb
+-   What is the highest rated TV show in between Adult swim, cartoon network, nickodeon? based on IMDb
 -   Which TV channel produces the most CGI based series? alternative question: How has the use of CGI in TV series changed over time? another alternative, what are the most common techniques used to create a TV show? sum up the each technique used by each show.
 
 ### **Data Visualization**

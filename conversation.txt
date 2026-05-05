@@ -1,0 +1,8 @@
+Conversation:
+
+User: Using r remove text from the end of strings that has (2001)
+
+Assistant: In R, you can remove a pattern like (2001) from the end of
+strings using a regular expression…
+
+User: create a text file of the conversation
