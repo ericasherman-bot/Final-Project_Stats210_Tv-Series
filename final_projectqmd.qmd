@@ -24,6 +24,7 @@ library(forcats)
 library(tidyverse)
 library(stringr)
 library(ggplot2)
+library(ggridges)
 tvseries<- read_csv("data/Animated_Tv_Series.csv")
 
 ```
@@ -40,19 +41,14 @@ tvclean <- tvseries |>
 
 ```{r}
 #| label: visualization-1
+
 tvclean |>
-  group_by(original_channel, start_year) |>
-  summarize(mean_imdb = mean(im_db, na.rm = TRUE), .groups = "drop") |>
-  arrange(desc(mean_imdb)) |>
-  filter(start_year >= 2000, start_year <= 2019) |>
-  slice_head(n=100) |>
- # filter(
-  #  original_channel %in% c("Cartoon Network", "Nickelodeon", "Disney Channel", "Adult Swim", "Fox")) |>
-  ggplot(aes(x = start_year, y = mean_imdb, fill = original_channel)) +
-  geom_tile(position = "dodge") +
-  scale_fill_viridis_d(option ="mako") +
-  theme(legend.text = element_blank())
-  #scale_fill_manual(values = c("#823749", "#983998", "#109", "#324556", "#676", "#217"))
+  filter(start_year >= 1999, start_year <= 2019) |> #filtering from these specifc years
+  ggplot(aes(x = im_db, y = factor(start_year), fill = ..x..)) +
+  geom_density_ridges_gradient(scale = 2) +
+  scale_fill_viridis_c(option = "mako") +
+  labs(y = "Start Year", x = "IMDb Rating")
+
 ```
 
 ```{r}
@@ -63,12 +59,21 @@ tvclean|>
   arrange(desc(episodes)) |>
   slice_head(n = 40) |>
   mutate(new_title = str_remove(title, "\\s*\\(\\d{4}\\)$")) |> #see chat gpt conversation.txt
-  ggplot(aes(x = im_db, y = new_title, fill = original_channel)) +
+  ggplot(aes(x = im_db, y = reorder(new_title, im_db, .desc = TRUE), fill = original_channel)) +
   geom_col() +
   labs(x= "Title of Tv Shows",
        y = "imdb") +
   scale_fill_viridis_d(option = "mako") +
   theme(axis.text.x = element_text(angle = 0, hjust = 1))
+```
+```{r}
+#| label: Imdb-rating-tv-channel
+tvclean |>
+  filter(original_channel %in% c("Adult Swim", "Cartoon Network", "Disney Channel", "Nickelodeon")) |>
+  ggplot(aes(x = im_db, y = original_channel, fill = after_stat(x))) +
+  geom_density_ridges_gradient(scale = 2) +
+  scale_fill_viridis_c(option = "mako") +
+  labs(x = "IMDb Rating", y = "Channel")
 ```
 
 
@@ -78,10 +83,10 @@ tvclean|>
 
 2.  My data contains TV shows, their channels, IMDb ratings, google users, episodes, years the shows were on air for, and techniques of how the shows were shot. I will be focusing on a few variables, the titles of shows, the year of which they were on air for, the IMDb ratings, maybe the episodes, and the techniques.
 
-3.  What is the most popular TV channel in each year? I will answer this by summing up the amount of shows releases within that year for that particular channel.
+3.  How do the distributions of IMDb ratings vary across years from 1999 to 2019? I choose these years because I wanted the cutoff to be before covid, since I though covid my influence the data and decided to do a 20 year period. I could not plot all years because the graph was too crowded.
 
--   What is the highest rated TV show in between Adult swim, cartoon network, nickodeon? based on IMDb
--   Which TV channel produces the most CGI based series? alternative question: How has the use of CGI in TV series changed over time? another alternative, what are the most common techniques used to create a TV show? sum up the each technique used by each show.
+-   What is the highest rated TV show in between, disney channel, Adult swim, cartoon network, nickodeon? based on IMDb
+-   Which TV channel produces the most CGI based series? alternative question: 
 
 ### **Data Visualization**
 
