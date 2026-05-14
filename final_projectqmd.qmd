@@ -24,6 +24,7 @@ library(forcats)
 library(tidyverse)
 library(stringr)
 library(ggplot2)
+library(ggdist)
 library(ggridges)
 tvseries<- read_csv("data/Animated_Tv_Series.csv")
 
@@ -33,50 +34,62 @@ tvseries<- read_csv("data/Animated_Tv_Series.csv")
 #| label: data-cleaning
 tvclean <- tvseries |>
   clean_names() |>
-  select(id, title, episodes, year, original_channel, technique, im_db, google_users) |>
+  select(id, title, episodes, year, original_channel, im_db) |>
   drop_na() |>
-  separate(year, into = c("start_year", "end_year"), sep = "-") |> #separating the years into two new columns one column being the release year and the second column being the end year. The years are being split by the dash.
-  mutate(across(c(start_year, end_year), as.numeric))
+   mutate(str_replace_all(year, "-", "-"),
+          start_year = readr::parse_number(year),
+          end_year = readr::parse_number(stringr::str_extract(year, "(?<=-)\\d{4}")))#setting this as numeric variables
+  write_csv(tvclean, "data/tvclean.csv") 
 ```
 
 ```{r}
 #| label: visualization-1
 #| fig-height: 8
 #| fig-width: 10
-tvclean |>
+#| fig-alt: "Ridge plot showing distribution of IMDb ratings for Tv shows by their start year (1999-2019), illustrating how distributions vary across years. Each ridge represents the year and each show was released within that year"
+
+ tvclean |>
   filter(start_year >= 1999, start_year <= 2019) |> #filtering from these specifc years
   ggplot(aes(x = im_db, y = factor(start_year), fill = ..x..)) +
   geom_density_ridges_gradient(scale = 2) +
   scale_fill_viridis_c(option = "mako") +
-  labs(y = "", x = "IMDb Rating", title = "Distribution of IMDb Ratings by Show Start Year (1999–2019)", fill = "IMDb Rating") +
+  labs(y = "", 
+       x = "IMDb",
+       title = "Distribution of IMDb Ratings by Show Start Year (1999–2019)",
+       fill = "IMDb Rating",
+       caption = "Each horizontal ridge shows the distribution of IMDb ratings for TV shows by their start year, highlighting how ratings vary across time (1999–2019).") +
   theme_abyss() +
   theme(axis.text.x = element_text(angle = 0, hjust = 1)) +
-   theme( plot.title = element_text(size = 16, face = "bold", hjust = 0.4),
+  theme( plot.title = element_text(size = 16, face = "bold", hjust = 0.4),
     axis.title.x = element_text(size = 12, face = "plain"),
     plot.title.position = "plot",
     axis.text.y = element_text(size = 13, face = "plain"), #changes size of channels on the y axis
     axis.text.x = element_text(size = 13, face = "plain"),
     legend.title = element_text(face = "plain"),
-    legend.position = "top", legend.justification = "left")
+    legend.position = "top", legend.justification = "left",
+    plot.caption.position = "plot", 
+    plot.caption = element_text(size = 9, hjust = 0))
 
 ```
 
 ```{r}
 #| label: visualization-2
 #| fig-height: 8
-#| fig-width: 10
+#| fig-width: 11
+#| fig-alt: "A barplot showing the IMDb rating for the top 40 TV shows in decending order that are produced by Adult Swim, Cartoon Network, Disney Channel and Nickelodeon."
 #tv show versus imdb
-tvclean|>
+ tvclean|>
   filter(original_channel %in% c("Adult Swim", "Cartoon Network", "Disney Channel", "Nickelodeon")) |>
-  arrange(desc(episodes)) |>
-  slice_head(n = 40) |>
+  arrange(desc(im_db)) |>
+  slice_head(n = 40) |> #did top 40 because plotting more than 40 shows looked hectic.
   mutate(new_title = str_remove(title, "\\s*\\(\\d{4}\\)$")) |> #see chat gpt conversation.txt
   ggplot(aes(x = im_db, y = reorder(new_title, im_db, .desc = TRUE), fill = original_channel)) +
   geom_col() +
   labs(x= "IMDb",
        y = "",
       fill = "TV Channel", color = "TV Channel",
-      title = "IMDb Rating for Top 40 Shows within Selected TV Channels") +
+      title = "IMDb Rating for Top 40 Shows in the Selected TV Channels",
+      caption = "Top 40 shows selected based on highest IMDb ratings. Graph includes Adult Swim, Cartoon Network, Disney Channel, and Nickelodeon.") +
   theme_abyss() +
   scale_fill_viridis_d(option = "mako") +
   theme(axis.text.x = element_text(angle = 0, hjust = 1)) +
@@ -85,7 +98,9 @@ tvclean|>
     plot.title.position = "plot",
     axis.text.y = element_text(size = 13, face = "plain"), #changes size of channels on the y axis
     axis.text.x = element_text(size = 13, face = "plain"),
-    legend.title = element_text(face = "plain"))
+    legend.title = element_text(face = "plain"),
+    plot.caption.position = "plot", 
+    plot.caption = element_text(size = 9, hjust = 0)) 
 
 ```
 
@@ -93,6 +108,8 @@ tvclean|>
 ```{r}
 #| label: Imdb-rating-tv-channel
 #| fig-height: 7
+#| fig-alt: "Raincloud plot comparing IMDb rating distributions for TV shows by Tv channels combining density curves, boxplots and individual show ratings for Adult Swim, Cartoon Network, Disney Channel, and Nickelodeon. Also highlighting differences in spread and central tendency."
+
 tvclean |>
   filter(original_channel %in% c("Adult Swim", "Cartoon Network", "Disney Channel", "Nickelodeon")) |>
   arrange(desc(original_channel)) |>
@@ -105,7 +122,10 @@ tvclean |>
               height = 0.05,
               size = 0.2,
               alpha = 0.2) +
-  labs(x = "IMDb Rating", y = "", title = "Distribution of IMDb Ratings for Selected TV Channels")+
+  labs(x = "IMDb Rating", 
+       y = "",
+       title = "Distribution of IMDb Ratings for Selected TV Channels",
+       caption = "Each channel’s distribution of IMDb ratings is shown using a combination of density curves, boxplots, and individual data points.") +
   theme_abyss() +
   scale_fill_viridis_d(option = "mako") +
   scale_color_viridis_d(option = "mako") + 
@@ -113,28 +133,31 @@ tvclean |>
   theme( plot.title = element_text(size = 16, face = "bold"),
     axis.title.x = element_text(size = 12, face = "plain"),
     axis.text.y = element_text(size = 13, face = "plain"), #changes size of channels on the y axis
-    axis.text.x = element_text(size = 13, face = "bold")) #changes size of imdb numbers 
+    axis.text.x = element_text(size = 13, face = "bold"), #changes size of imdb numbers 
+    plot.caption.position = "plot", 
+    plot.caption = element_text(size = 9, hjust = 0)) 
 ```
 
 
 ### **Data Description**
 
-1.  The data source I will be using is from Kaggle. It is a fun TV series data set with a lot of my favorite shows from my childhoods. I wanted to choose a fun data set for my project.
+1.  The data source is from Kaggle. It is a fun TV series data set with a lot of my favorite shows from my childhood. I wanted to choose a fun data set for my project.
 
 2.  My data contains TV shows, their channels, IMDb ratings, google users, episodes, years the shows were on air for, and techniques of how the shows were shot. I will be focusing on a few variables, the titles of shows, the year of which they were on air for, the IMDb ratings, maybe the episodes, and the techniques.
 
 3.  How do the distributions of IMDb ratings vary across years from 1999 to 2019? I choose these years because I wanted the cutoff to be before covid, since I though covid my influence the data and decided to do a 20 year period. I could not plot all years because the graph was too crowded.
 
--   What is the highest rated TV show in between, disney channel, Adult swim, cartoon network, nickodeon? based on IMDb
--   Which TV channel produces the most CGI based series? alternative question: 
+- How do distributions of the IMDb ratings for TV shows based on their start year across the time period 1999-2019 vary?
+- What are the top rated TV shows based on IMDb between  Adult swim, Cartoon Network, Disney Channel, Nickelodeon? (I only chose the top 40 because trying to graph more than 40 made the plot look overcrowded)
+- What is the highest rated TV show in between Adult swim, Cartoon Network, Disney Channel, Nickelodeon? based on IMDb
 
 ### **Data Visualization**
 
-1.  I think I will be doing time series data, so I might do a simple bar plot and line plot.
+1.  For time series data I ended up creating a ridgeline plot with density. Each ridgeline represents the start year of all the shows that were released in that year, and the x axis is mapped to IMDb rating. It shows a summary of all the shows for each year. So "Regular Show", for instance, was released in 2010, so regular show will only be plotted in that year. 
 
-2.  I would highlight the most popular TV channel throughout the year by adding text to that case on the graph. I will highlight the highest rated TV show by ordering the bars from largest to smallest.
+2.  For the second visualization I created a barplot in descending order to show the top rated show (based on IMDb) within the four TV channels, Adult Swim, Cartoon Network, Disney Channel, Nickelodeon specific channel, which is "Avatar: The Last Airbender" Produced by Nickelodeon.
 
-3.  I would need sum up the number of TV channels and connect the shows to their release year to find out the total shows within that year apart of the specific channel.
+3.  Lastly, I wanted to look at the distributions of IMDb ratings of TV shows within the four TV channels selected and if one on average had a higher IMDb rating than the other three. So I created a raincloud plot. I really didn't need to do this or do three questions, but I really wanted to create cool visualizations, and ever since Stats 310, I've been dying create a raincloud plot, and I finally had a data set that worked for it. I got the code from Stats 310 worksheet. All four distributions have roughly the same mean and median. The distribution of Nickelodeon is slightly more spread than the other three. 
 
 ### **Data Cleaning**
 
