@@ -14,9 +14,9 @@ code like this:![](images/clipboard-40922044.png)
 
 ### **Data Description**
 
-1.  The data source I will be using is from Kaggle. It is a fun TV
-    series data set with a lot of my favorite shows from my childhoods.
-    I wanted to choose a fun data set for my project.
+1.  The data source is from Kaggle. It is a fun TV series data set with
+    a lot of my favorite shows from my childhood. I wanted to choose a
+    fun data set for my project.
 
 2.  My data contains TV shows, their channels, IMDb ratings, google
     users, episodes, years the shows were on air for, and techniques of
@@ -30,23 +30,41 @@ code like this:![](images/clipboard-40922044.png)
     to do a 20 year period. I could not plot all years because the graph
     was too crowded.
 
-- What is the highest rated TV show in between, disney channel, Adult
-  swim, cartoon network, nickodeon? based on IMDb
-- Which TV channel produces the most CGI based series? alternative
-  question:
+- How do distributions of the IMDb ratings for TV shows based on their
+  start year across the time period 1999-2019 vary?
+- What are the top rated TV shows based on IMDb between Adult swim,
+  Cartoon Network, Disney Channel, Nickelodeon? (I only chose the top 40
+  because trying to graph more than 40 made the plot look overcrowded)
+- What is the highest rated TV show in between Adult swim, Cartoon
+  Network, Disney Channel, Nickelodeon? based on IMDb
 
 ### **Data Visualization**
 
-1.  I think I will be doing time series data, so I might do a simple bar
-    plot and line plot.
+1.  For my first visualization I created a ridgeline plot with density.
+    Each ridgeline represents the start year of all the shows that were
+    released in that year, and the x axis is mapped to IMDb rating. It
+    shows a summary of all the shows for each year. So “Regular Show”,
+    for instance, was released in 2010, so regular show will only be
+    plotted in that year.
 
-2.  I would highlight the most popular TV channel throughout the year by
-    adding text to that case on the graph. I will highlight the highest
-    rated TV show by ordering the bars from largest to smallest.
+![](images/imdb_ridge_plot.png)
 
-3.  I would need sum up the number of TV channels and connect the shows
-    to their release year to find out the total shows within that year
-    apart of the specific channel.
+2.  For the second visualization I created a barplot in descending order
+    to show the top rated show (based on IMDb) within the four selected
+    TV channels, Adult Swim, Cartoon Network, Disney Channel,
+    Nickelodeon specific channel. The TV show with the highest IMDb
+    rating is “Avatar: The Last Airbender” Produced by Nickelodeon.
+
+![](images/imdb_bar_plot.png)
+
+3.  Lastly, I wanted to look at the distributions of IMDb ratings of TV
+    shows within the four TV channels selected and if one on average had
+    a higher IMDb rating than the other three. So I created a raincloud
+    plot. All four distributions have roughly the same mean and median.
+    The distribution of Nickelodeon has more spread than the other three
+    channels.
+
+![](images/imdb_cloud_plot.png)
 
 ### **Data Cleaning**
 

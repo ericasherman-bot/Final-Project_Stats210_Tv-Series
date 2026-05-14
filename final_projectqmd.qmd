@@ -8,13 +8,7 @@ execute:
   warning: false
 ---
 
-## Quarto
 
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
-
-## Running Code
-
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:![](images/clipboard-40922044.png)
 
 ```{r}
 library(readr)
@@ -36,9 +30,10 @@ tvclean <- tvseries |>
   clean_names() |>
   select(id, title, episodes, year, original_channel, im_db) |>
   drop_na() |>
-   mutate(str_replace_all(year, "-", "-"),
+   mutate(year = str_replace_all(year, "-", "-"),
           start_year = readr::parse_number(year),
-          end_year = readr::parse_number(stringr::str_extract(year, "(?<=-)\\d{4}")))#setting this as numeric variables
+          end_year = readr::parse_number(stringr::str_extract(year, "(?<=-)\\d{4}")),
+          new_title = str_remove(title, "\\s*\\(\\d{4}\\)$")) #see chat gpt conversation.txt
   write_csv(tvclean, "data/tvclean.csv") 
 ```
 
@@ -48,8 +43,8 @@ tvclean <- tvseries |>
 #| fig-width: 10
 #| fig-alt: "Ridge plot showing distribution of IMDb ratings for Tv shows by their start year (1999-2019), illustrating how distributions vary across years. Each ridge represents the year and each show was released within that year"
 
- tvclean |>
-  filter(start_year >= 1999, start_year <= 2019) |> #filtering from these specifc years
+ r<- tvclean |>
+  filter(start_year >= 1999, start_year <= 2019) |> #filtering from these specific years
   ggplot(aes(x = im_db, y = factor(start_year), fill = ..x..)) +
   geom_density_ridges_gradient(scale = 2) +
   scale_fill_viridis_c(option = "mako") +
@@ -69,7 +64,7 @@ tvclean <- tvseries |>
     legend.position = "top", legend.justification = "left",
     plot.caption.position = "plot", 
     plot.caption = element_text(size = 9, hjust = 0))
-
+ggsave("imdb_ridge_plot.png", plot = r, width = 10, height = 7)
 ```
 
 ```{r}
@@ -78,11 +73,10 @@ tvclean <- tvseries |>
 #| fig-width: 11
 #| fig-alt: "A barplot showing the IMDb rating for the top 40 TV shows in decending order that are produced by Adult Swim, Cartoon Network, Disney Channel and Nickelodeon."
 #tv show versus imdb
- tvclean|>
+ b<-tvclean|>
   filter(original_channel %in% c("Adult Swim", "Cartoon Network", "Disney Channel", "Nickelodeon")) |>
   arrange(desc(im_db)) |>
   slice_head(n = 40) |> #did top 40 because plotting more than 40 shows looked hectic.
-  mutate(new_title = str_remove(title, "\\s*\\(\\d{4}\\)$")) |> #see chat gpt conversation.txt
   ggplot(aes(x = im_db, y = reorder(new_title, im_db, .desc = TRUE), fill = original_channel)) +
   geom_col() +
   labs(x= "IMDb",
@@ -101,16 +95,16 @@ tvclean <- tvseries |>
     legend.title = element_text(face = "plain"),
     plot.caption.position = "plot", 
     plot.caption = element_text(size = 9, hjust = 0)) 
-
+ggsave("imdb_bar_plot.png", plot = b, width = 10, height = 7)
 ```
 
 
 ```{r}
-#| label: Imdb-rating-tv-channel
+#| label: Visualization 3
 #| fig-height: 7
 #| fig-alt: "Raincloud plot comparing IMDb rating distributions for TV shows by Tv channels combining density curves, boxplots and individual show ratings for Adult Swim, Cartoon Network, Disney Channel, and Nickelodeon. Also highlighting differences in spread and central tendency."
 
-tvclean |>
+cloud<-tvclean |>
   filter(original_channel %in% c("Adult Swim", "Cartoon Network", "Disney Channel", "Nickelodeon")) |>
   arrange(desc(original_channel)) |>
   ggplot(aes(x = im_db, y = reorder(original_channel,im_db), fill = original_channel))  +
@@ -136,6 +130,7 @@ tvclean |>
     axis.text.x = element_text(size = 13, face = "bold"), #changes size of imdb numbers 
     plot.caption.position = "plot", 
     plot.caption = element_text(size = 9, hjust = 0)) 
+ggsave("imdb_cloud_plot.png", plot = cloud, width = 10, height = 7)
 ```
 
 
@@ -153,47 +148,22 @@ tvclean |>
 
 ### **Data Visualization**
 
-1.  For time series data I ended up creating a ridgeline plot with density. Each ridgeline represents the start year of all the shows that were released in that year, and the x axis is mapped to IMDb rating. It shows a summary of all the shows for each year. So "Regular Show", for instance, was released in 2010, so regular show will only be plotted in that year. 
+1. For my first visualization I created a ridgeline plot with density. Each ridgeline represents the start year of all the shows that were released in that year, and the x axis is mapped to IMDb rating. It shows a summary of all the shows for each year. So "Regular Show", for instance, was released in 2010, so regular show will only be plotted in that year. 
 
-2.  For the second visualization I created a barplot in descending order to show the top rated show (based on IMDb) within the four TV channels, Adult Swim, Cartoon Network, Disney Channel, Nickelodeon specific channel, which is "Avatar: The Last Airbender" Produced by Nickelodeon.
+![](images/imdb_ridge_plot.png)
 
-3.  Lastly, I wanted to look at the distributions of IMDb ratings of TV shows within the four TV channels selected and if one on average had a higher IMDb rating than the other three. So I created a raincloud plot. I really didn't need to do this or do three questions, but I really wanted to create cool visualizations, and ever since Stats 310, I've been dying create a raincloud plot, and I finally had a data set that worked for it. I got the code from Stats 310 worksheet. All four distributions have roughly the same mean and median. The distribution of Nickelodeon is slightly more spread than the other three. 
+2. For the second visualization I created a barplot in descending order to show the top rated show (based on IMDb) within the four selected TV channels, Adult Swim, Cartoon Network, Disney Channel, Nickelodeon specific channel. The TV show with the highest IMDb rating is "Avatar: The Last Airbender" Produced by Nickelodeon.
+
+![](images/imdb_bar_plot.png)
+
+3. Lastly, I wanted to look at the distributions of IMDb ratings of TV shows within the four TV channels selected and if one on average had a higher IMDb rating than the other three. So I created a raincloud plot. All four distributions have roughly the same mean and median. The distribution of Nickelodeon has more spread than the other three channels. 
+
+![](images/imdb_cloud_plot.png)
 
 ### **Data Cleaning**
 
-The answer to at least three of these questions should be “YES” for the data to meet the necessary standards to demonstrate your cleaning. Your data source should not be an already perfectly prepared data set.
 
-1.  Do you need to reformat any variables into different types (e.g. factors, time, dates, strings)? Or remove information from variable values? yes. I need to remove information in the year column. The year column has the shows start and end date and I just want the start date.
-2.  Do you need to deal with any missing data, especially missing data coded other than NA?
+ I first started by cleaning the names and then selecting the variables I was going to use for my visualizations, imdb, tv channel, title, and year. I then dropped any na values from the data. The year column had the start and end year of each show, so I had to create a two new columns, one with only the start year and the other with the end year. Some of the TV shows had the start and end date embedded into the title so I asked chat GPT how to use string r text to extract the numbers and characters out of the titles. Lastly, I saved the cleaned data set as an object then a csv file and placed into a data folder. I did additional data cleaning that were specific to each visualization. For the first visualization: "Distribution of IMDb Ratings by Show Start Year (1999–2019)," I filtered the cleaned data set to include only television shows with start years between 1999 and 2019. For the second visualization: "IMDb Rating for Top 40 Shows in the Selected TV Channels," I filtered the data set to include four TV Channels: Adult Swim, Cartoon Network, Disney Channel, and Nickelodeon. I chose these channels they ones I watched growing up and provided an interesting basis for comparison. I then arranged  in descending order by IMDb rating, and only the top 40 shows were included to maintain readability and reduce overcrowding. For the third visualization: "Distribution of IMDb Ratings for Selected TV Channels," I again filtered the data set to include the same four TV Channels and arranged in descending order by TV channel.
 
--   no
 
-3.  Do you need to filter your data? How?
 
--   Yes, I would use the filter function to filter out any na's in the data. And I will use filter to first find the na's in the variables I want to use, if any.
-
-4.  Do you need to create any new variables? What variables? How?
-
--   I might need to create new variables with mutate. I can create a new variable that only has the start year for each episode and keep the old variable with the total time the show was on air for.
-
-5.  Do you need to add new data (join) to your data? What data? How?
-
--   no
-
-6.  Do you need pivot your data in any way? Why? How?
-
--   no
-
-7.  Do you need to summarize any of the variables? Which ones? How?
-
--   yes, I would need to summarize the top ratings of the TV shows, summarize the total number of shows produced by a channel for each year. I will also use summarize to the total number of shows that use CGI.
-
-8.  What other aspects of your data need to be “fixed” in order to make your data visualizations?
-
--   I might get ride of the percents on the google user cases, if I end up using it.
-
-Most will answer yes to the following for making your programming more efficient using `select()`, but you should have **three other yeses above**.
-
-9.  Are there any variables you can exclude from your data?
-
--   I can exclude the American company name, note and id.
