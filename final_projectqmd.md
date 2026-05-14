@@ -3,17 +3,18 @@
 
 ### **Data Description**
 
-1.  The data source is from Kaggle. It is a fun TV series data set with
-    a lot of my favorite shows from my childhood. I wanted to choose a
-    fun data set for my project.
+The data set used in this project was obtained from Kaggle and contains
+information about a variety of television series. I selected this data
+set because it includes many shows that I watched growing up, making it
+both personally interesting and enjoyable to analyze. The data set
+includes variables such as television show titles, original channels,
+IMDb ratings, Google user ratings, number of episodes, years the shows
+aired and production techniques. For this project, I focused on the
+variables related to show titles, years on air, television channels, and
+IMDb ratings in order to explore trends and differences in television
+ratings across time and networks.
 
-2.  My data contains TV shows, their channels, IMDb ratings, google
-    users, episodes, years the shows were on air for, and techniques of
-    how the shows were shot. I will be focusing on a few variable; the
-    titles of shows, the year of which they were on air for, tv channels
-    and IMDb ratings.
-
-3.  Research Questions:
+Research Questions:
 
 - How do distributions of the IMDb ratings for TV shows based on their
   start year across the time period 1999-2019 vary?
@@ -58,30 +59,33 @@ IMDb Ratings for Selected TV Channels,” I again filtered the data set to
 include the same four TV Channels and arranged in descending order by TV
 channel.
 
-### **Data Visualization**
+### **Visualization 1**
 
-1.  For my first visualization I created a ridgeline plot with density.
-    Each ridgeline represents the start year of all the shows that were
-    released in that year, and the x axis is mapped to IMDb rating. It
-    shows a summary of all the shows for each year. So “Regular Show”,
-    for instance, was released in 2010, so regular show will only be
-    plotted in that year.
+For my first visualization I created a ridgeline plot with density. Each
+ridgeline represents the start year of all the shows that were released
+in that year, and the x axis is mapped to IMDb rating. It shows a
+summary of all the shows for each year. So “Regular Show”, for instance,
+was released in 2010, so regular show will only be plotted in that year.
 
 ![](images/imdb_ridge_plot.png)
 
-2.  For the second visualization I created a barplot in descending order
-    to show the top rated show (based on IMDb) within the four selected
-    TV channels, Adult Swim, Cartoon Network, Disney Channel,
-    Nickelodeon specific channel. The TV show with the highest IMDb
-    rating is “Avatar: The Last Airbender” Produced by Nickelodeon.
+### **Visualization 2**
+
+For the second visualization I created a barplot in descending order to
+show the top rated show (based on IMDb) within the four selected TV
+channels, Adult Swim, Cartoon Network, Disney Channel, Nickelodeon
+specific channel. The TV show with the highest IMDb rating is “Avatar:
+The Last Airbender” Produced by Nickelodeon.
 
 ![](images/imdb_bar_plot.png)
 
-3.  Lastly, I wanted to look at the distributions of IMDb ratings of TV
-    shows within the four TV channels selected and if one on average had
-    a higher IMDb rating than the other three. So I created a raincloud
-    plot. All four distributions have roughly the same mean and median.
-    The distribution of TV channel Nickelodeon has more spread than the
-    other three channels.
+### **Visualization 3**
+
+Lastly, I wanted to look at the distributions of IMDb ratings of TV
+shows within the four TV channels selected and if one on average had a
+higher IMDb rating than the other three. So I created a raincloud plot.
+All four distributions have roughly the same mean and median. The
+distribution of TV channel Nickelodeon has more spread than the other
+three channels.
 
 ![](images/imdb_cloud_plot.png)
