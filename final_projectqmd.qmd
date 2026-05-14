@@ -35,24 +35,36 @@ tvclean <- tvseries |>
   clean_names() |>
   select(id, title, episodes, year, original_channel, technique, im_db, google_users) |>
   drop_na() |>
-  separate(year, into = c("start_year", "end_year"), sep = "-") |>
+  separate(year, into = c("start_year", "end_year"), sep = "-") |> #separating the years into two new columns one column being the release year and the second column being the end year. The years are being split by the dash.
   mutate(across(c(start_year, end_year), as.numeric))
 ```
 
 ```{r}
 #| label: visualization-1
-
+#| fig-height: 8
+#| fig-width: 10
 tvclean |>
   filter(start_year >= 1999, start_year <= 2019) |> #filtering from these specifc years
   ggplot(aes(x = im_db, y = factor(start_year), fill = ..x..)) +
   geom_density_ridges_gradient(scale = 2) +
   scale_fill_viridis_c(option = "mako") +
-  labs(y = "Start Year", x = "IMDb Rating")
+  labs(y = "", x = "IMDb Rating", title = "Distribution of IMDb Ratings by Show Start Year (1999–2019)", fill = "IMDb Rating") +
+  theme_abyss() +
+  theme(axis.text.x = element_text(angle = 0, hjust = 1)) +
+   theme( plot.title = element_text(size = 16, face = "bold", hjust = 0.4),
+    axis.title.x = element_text(size = 12, face = "plain"),
+    plot.title.position = "plot",
+    axis.text.y = element_text(size = 13, face = "plain"), #changes size of channels on the y axis
+    axis.text.x = element_text(size = 13, face = "plain"),
+    legend.title = element_text(face = "plain"),
+    legend.position = "top", legend.justification = "left")
 
 ```
 
 ```{r}
 #| label: visualization-2
+#| fig-height: 8
+#| fig-width: 10
 #tv show versus imdb
 tvclean|>
   filter(original_channel %in% c("Adult Swim", "Cartoon Network", "Disney Channel", "Nickelodeon")) |>
@@ -61,19 +73,47 @@ tvclean|>
   mutate(new_title = str_remove(title, "\\s*\\(\\d{4}\\)$")) |> #see chat gpt conversation.txt
   ggplot(aes(x = im_db, y = reorder(new_title, im_db, .desc = TRUE), fill = original_channel)) +
   geom_col() +
-  labs(x= "Title of Tv Shows",
-       y = "imdb") +
+  labs(x= "IMDb",
+       y = "",
+      fill = "TV Channel", color = "TV Channel",
+      title = "IMDb Rating for Top 40 Shows within Selected TV Channels") +
+  theme_abyss() +
   scale_fill_viridis_d(option = "mako") +
-  theme(axis.text.x = element_text(angle = 0, hjust = 1))
+  theme(axis.text.x = element_text(angle = 0, hjust = 1)) +
+   theme( plot.title = element_text(size = 16, face = "bold", hjust = 0.4),
+    axis.title.x = element_text(size = 12, face = "plain"),
+    plot.title.position = "plot",
+    axis.text.y = element_text(size = 13, face = "plain"), #changes size of channels on the y axis
+    axis.text.x = element_text(size = 13, face = "plain"),
+    legend.title = element_text(face = "plain"))
+
 ```
+
+
 ```{r}
 #| label: Imdb-rating-tv-channel
+#| fig-height: 7
 tvclean |>
   filter(original_channel %in% c("Adult Swim", "Cartoon Network", "Disney Channel", "Nickelodeon")) |>
-  ggplot(aes(x = im_db, y = original_channel, fill = after_stat(x))) +
-  geom_density_ridges_gradient(scale = 2) +
-  scale_fill_viridis_c(option = "mako") +
-  labs(x = "IMDb Rating", y = "Channel")
+  arrange(desc(original_channel)) |>
+  ggplot(aes(x = im_db, y = reorder(original_channel,im_db), fill = original_channel))  +
+
+  stat_halfeye(alpha = 0.5) +
+  stat_dots(side = "bottom") +
+  geom_boxplot(alpha = .2, width=0.1) +
+  geom_jitter(aes(color = original_channel),
+              height = 0.05,
+              size = 0.2,
+              alpha = 0.2) +
+  labs(x = "IMDb Rating", y = "", title = "Distribution of IMDb Ratings for Selected TV Channels")+
+  theme_abyss() +
+  scale_fill_viridis_d(option = "mako") +
+  scale_color_viridis_d(option = "mako") + 
+  guides(color = "none", fill = "none") +
+  theme( plot.title = element_text(size = 16, face = "bold"),
+    axis.title.x = element_text(size = 12, face = "plain"),
+    axis.text.y = element_text(size = 13, face = "plain"), #changes size of channels on the y axis
+    axis.text.x = element_text(size = 13, face = "bold")) #changes size of imdb numbers 
 ```
 
 

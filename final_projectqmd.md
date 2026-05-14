@@ -12,38 +12,6 @@ When you click the **Render** button a document will be generated that
 includes both content and the output of embedded code. You can embed
 code like this:![](images/clipboard-40922044.png)
 
-``` r
-library(readr)
-library(dplyr)
-library(janitor)
-library(forcats)
-library(tidyverse)
-library(stringr)
-library(ggplot2)
-tvseries<- read_csv("data/Animated_Tv_Series.csv")
-```
-
-``` r
-tvclean <- tvseries |>
-  clean_names() |>
-  select(id, title, episodes, year, original_channel, technique, im_db, google_users) |>
-  drop_na() |>
-  separate(year, into = c("start_year", "end_year"), sep = "-") |>
-  mutate(across(c(start_year, end_year), as.numeric))
-```
-
-``` r
-tvclean |>
-  group_by(original_channel, start_year) |>
-  summarize(total_episodes = sum(episodes, na.rm = TRUE), .groups = "drop") |>
-  filter(
-    original_channel %in% c("Cartoon Network", "Nickelodeon", "Disney Channel", "Netflix", "Adult Swim", "Fox")) |>
-  ggplot(aes(x = start_year, y = total_episodes, fill = original_channel)) +
-  geom_col(position = "dodge") +
-  scale_fill_viridis_d(option ="mako")
-  #scale_fill_manual(values = c("#823749", "#983998", "#109", "#324556", "#676", "#217"))
-```
-
 ### **Data Description**
 
 1.  The data source I will be using is from Kaggle. It is a fun TV
@@ -56,15 +24,16 @@ tvclean |>
     titles of shows, the year of which they were on air for, the IMDb
     ratings, maybe the episodes, and the techniques.
 
-3.  What is the most popular TV channel in each year? I will answer this
-    by summing up the amount of shows releases within that year for that
-    particular channel.
+3.  How do the distributions of IMDb ratings vary across years from 1999
+    to 2019? I choose these years because I wanted the cutoff to be
+    before covid, since I though covid my influence the data and decided
+    to do a 20 year period. I could not plot all years because the graph
+    was too crowded.
 
-- What is the highest rated TV show in each year? based on IMDb
+- What is the highest rated TV show in between, disney channel, Adult
+  swim, cartoon network, nickodeon? based on IMDb
 - Which TV channel produces the most CGI based series? alternative
-  question: How has the use of CGI in TV series changed over time?
-  another alternative, what are the most common techniques used to
-  create a TV show? sum up the each technique used by each show.
+  question:
 
 ### **Data Visualization**
 
