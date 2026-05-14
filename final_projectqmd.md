@@ -1,17 +1,6 @@
 # TV Series Final Project
 
 
-## Quarto
-
-Quarto enables you to weave together content and executable code into a
-finished document. To learn more about Quarto see <https://quarto.org>.
-
-## Running Code
-
-When you click the **Render** button a document will be generated that
-includes both content and the output of embedded code. You can embed
-code like this:![](images/clipboard-40922044.png)
-
 ### **Data Description**
 
 1.  The data source is from Kaggle. It is a fun TV series data set with
@@ -20,23 +9,54 @@ code like this:![](images/clipboard-40922044.png)
 
 2.  My data contains TV shows, their channels, IMDb ratings, google
     users, episodes, years the shows were on air for, and techniques of
-    how the shows were shot. I will be focusing on a few variables, the
-    titles of shows, the year of which they were on air for, the IMDb
-    ratings, maybe the episodes, and the techniques.
+    how the shows were shot. I will be focusing on a few variable; the
+    titles of shows, the year of which they were on air for, tv channels
+    and IMDb ratings.
 
-3.  How do the distributions of IMDb ratings vary across years from 1999
-    to 2019? I choose these years because I wanted the cutoff to be
-    before covid, since I though covid my influence the data and decided
-    to do a 20 year period. I could not plot all years because the graph
-    was too crowded.
+3.  Research Questions:
 
 - How do distributions of the IMDb ratings for TV shows based on their
   start year across the time period 1999-2019 vary?
 - What are the top rated TV shows based on IMDb between Adult swim,
-  Cartoon Network, Disney Channel, Nickelodeon? (I only chose the top 40
-  because trying to graph more than 40 made the plot look overcrowded)
+  Cartoon Network, Disney Channel, Nickelodeon?
 - What is the highest rated TV show in between Adult swim, Cartoon
   Network, Disney Channel, Nickelodeon? based on IMDb
+
+I selected the years 1999–2019 to examine a 20-year period while
+excluding years affected by the COVID-19 pandemic, since the pandemic
+may have influenced television production and audience ratings.
+Including all years in the data set resulted in an overcrowded
+visualization, so the ridge-plot visualization was limited to this time
+range to improve readability. Similarly, for the bar chart
+visualization, only the top 40 shows were included because plotting a
+larger number of shows made the graph appear overly crowded and
+difficult to interpret.
+
+### **Data Cleaning**
+
+I first started by cleaning the names and then selecting the variables I
+was going to use for my visualizations, imdb, tv channel, title, and
+year. I then dropped any na values from the data. The year column had
+the start and end year of each show, so I had to create a two new
+columns, one with only the start year and the other with the end year.
+Some of the TV shows had the start and end date embedded into the title
+so I asked chat GPT how to use string r text to extract the numbers and
+characters out of the titles. Lastly, I saved the cleaned data set as an
+object then a csv file and placed into a data folder. I did additional
+data cleaning that were specific to each visualization. For the first
+visualization: “Distribution of IMDb Ratings by Show Start Year
+(1999–2019),” I filtered the cleaned data set to include only television
+shows with start years between 1999 and 2019. For the second
+visualization: “IMDb Rating for Top 40 Shows in the Selected TV
+Channels,” I filtered the data set to include four TV Channels: Adult
+Swim, Cartoon Network, Disney Channel, and Nickelodeon. I chose these
+channels they ones I watched growing up and provided an interesting
+basis for comparison. I then arranged in descending order by IMDb
+rating, and only the top 40 shows were included to maintain readability
+and reduce overcrowding. For the third visualization: “Distribution of
+IMDb Ratings for Selected TV Channels,” I again filtered the data set to
+include the same four TV Channels and arranged in descending order by TV
+channel.
 
 ### **Data Visualization**
 
@@ -61,64 +81,7 @@ code like this:![](images/clipboard-40922044.png)
     shows within the four TV channels selected and if one on average had
     a higher IMDb rating than the other three. So I created a raincloud
     plot. All four distributions have roughly the same mean and median.
-    The distribution of Nickelodeon has more spread than the other three
-    channels.
+    The distribution of TV channel Nickelodeon has more spread than the
+    other three channels.
 
 ![](images/imdb_cloud_plot.png)
-
-### **Data Cleaning**
-
-The answer to at least three of these questions should be “YES” for the
-data to meet the necessary standards to demonstrate your cleaning. Your
-data source should not be an already perfectly prepared data set.
-
-1.  Do you need to reformat any variables into different types
-    (e.g. factors, time, dates, strings)? Or remove information from
-    variable values? yes. I need to remove information in the year
-    column. The year column has the shows start and end date and I just
-    want the start date.
-2.  Do you need to deal with any missing data, especially missing data
-    coded other than NA?
-
-- no
-
-3.  Do you need to filter your data? How?
-
-- Yes, I would use the filter function to filter out any na’s in the
-  data. And I will use filter to first find the na’s in the variables I
-  want to use, if any.
-
-4.  Do you need to create any new variables? What variables? How?
-
-- I might need to create new variables with mutate. I can create a new
-  variable that only has the start year for each episode and keep the
-  old variable with the total time the show was on air for.
-
-5.  Do you need to add new data (join) to your data? What data? How?
-
-- no
-
-6.  Do you need pivot your data in any way? Why? How?
-
-- no
-
-7.  Do you need to summarize any of the variables? Which ones? How?
-
-- yes, I would need to summarize the top ratings of the TV shows,
-  summarize the total number of shows produced by a channel for each
-  year. I will also use summarize to the total number of shows that use
-  CGI.
-
-8.  What other aspects of your data need to be “fixed” in order to make
-    your data visualizations?
-
-- I might get ride of the percents on the google user cases, if I end up
-  using it.
-
-Most will answer yes to the following for making your programming more
-efficient using `select()`, but you should have **three other yeses
-above**.
-
-9.  Are there any variables you can exclude from your data?
-
-- I can exclude the American company name, note and id.
